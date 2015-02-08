@@ -85,17 +85,23 @@
 
 #pragma mark - Collection view methods
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 10;
+    return 1;
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 2;
+    return self.movies.count;
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     MovieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MovieCollectionCell" forIndexPath:indexPath];
-    UILabel *label = (UILabel *) [cell viewWithTag:100];
-    [label setText:@"HIKEN"];
+    NSDictionary *movie = self.movies[indexPath.row];
+
+    cell.titleLabel.text = movie[@"title"];
+    NSString *url = [movie valueForKeyPath:@"posters.thumbnail"];
+    url = [url stringByReplacingOccurrencesOfString:@"tmb" withString:@"ori"];
+    cell.posterView.image = nil;
+    [cell.posterView setImageWithURL:[NSURL URLWithString:url]];
+    
     return cell;
 }
 
@@ -113,6 +119,7 @@
     cell.synopsisLabel.text = movie[@"synopsis"];
     
     NSString *url = [movie valueForKeyPath:@"posters.thumbnail"];
+    cell.posterView.image = nil;
     [cell.posterView setImageWithURL:[NSURL URLWithString:url]];
     return cell;
 }
@@ -142,7 +149,7 @@
 }
 
 - (void)onRefresh {
-    NSURL *url = [NSURL URLWithString:@"http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=7gc6v2tkga4wsbsq5qfk7kyd"];
+    NSURL *url = [NSURL URLWithString:@"http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=7gc6v2tkga4wsbsq5qfk7kyd&limit=20"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         if (data == nil) {
@@ -155,6 +162,7 @@
             NSLog(@"response: %@", responseDictionary);
             self.movies = responseDictionary[@"movies"];
             [self.tableView reloadData];
+            [self.collectionView reloadData];
         }
         [self.refreshControl endRefreshing];
         [SVProgressHUD dismiss];

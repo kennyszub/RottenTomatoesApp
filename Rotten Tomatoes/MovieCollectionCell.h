@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface MovieCollectionCell : UICollectionViewCell
-@property (nonatomic, strong) IBOutlet UILabel *customLabel;
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *posterView;
+
+
 
 @end
