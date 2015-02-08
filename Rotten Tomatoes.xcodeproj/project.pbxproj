@@ -19,6 +19,8 @@
 		C4BD68C51A86B9DC0074F71B /* MovieCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C4BD68C31A86B9DC0074F71B /* MovieCell.xib */; };
 		C4BD68CE1A86CEA80074F71B /* MovieDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C4BD68CC1A86CEA80074F71B /* MovieDetailViewController.m */; };
 		C4BD68CF1A86CEA80074F71B /* MovieDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C4BD68CD1A86CEA80074F71B /* MovieDetailViewController.xib */; };
+		C4BD68DE1A8713550074F71B /* MovieCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C4BD68DC1A8713550074F71B /* MovieCollectionCell.m */; };
+		C4BD68DF1A8713550074F71B /* MovieCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C4BD68DD1A8713550074F71B /* MovieCollectionCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,9 @@
 		C4BD68CB1A86CEA80074F71B /* MovieDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovieDetailViewController.h; sourceTree = "<group>"; };
 		C4BD68CC1A86CEA80074F71B /* MovieDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MovieDetailViewController.m; sourceTree = "<group>"; };
 		C4BD68CD1A86CEA80074F71B /* MovieDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MovieDetailViewController.xib; sourceTree = "<group>"; };
+		C4BD68DB1A8713550074F71B /* MovieCollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovieCollectionCell.h; sourceTree = "<group>"; };
+		C4BD68DC1A8713550074F71B /* MovieCollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MovieCollectionCell.m; sourceTree = "<group>"; };
+		C4BD68DD1A8713550074F71B /* MovieCollectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MovieCollectionCell.xib; sourceTree = "<group>"; };
 		EF50162310F5AE866EDFEC84 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -162,6 +167,9 @@
 				C4BD68C11A86B9DC0074F71B /* MovieCell.h */,
 				C4BD68C21A86B9DC0074F71B /* MovieCell.m */,
 				C4BD68C31A86B9DC0074F71B /* MovieCell.xib */,
+				C4BD68DB1A8713550074F71B /* MovieCollectionCell.h */,
+				C4BD68DC1A8713550074F71B /* MovieCollectionCell.m */,
+				C4BD68DD1A8713550074F71B /* MovieCollectionCell.xib */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -257,6 +265,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4BD68DF1A8713550074F71B /* MovieCollectionCell.xib in Resources */,
 				C4BD68CF1A86CEA80074F71B /* MovieDetailViewController.xib in Resources */,
 				C49C80FF1A8210EE00B59F9E /* LaunchScreen.xib in Resources */,
 				C49C81181A8213E400B59F9E /* MoviesViewController.xib in Resources */,
@@ -314,6 +323,7 @@
 			files = (
 				C49C81171A8213E400B59F9E /* MoviesViewController.m in Sources */,
 				C49C80F41A8210EE00B59F9E /* AppDelegate.m in Sources */,
+				C4BD68DE1A8713550074F71B /* MovieCollectionCell.m in Sources */,
 				C4BD68CE1A86CEA80074F71B /* MovieDetailViewController.m in Sources */,
 				C4BD68C41A86B9DC0074F71B /* MovieCell.m in Sources */,
 				C49C80F11A8210EE00B59F9E /* main.m in Sources */,

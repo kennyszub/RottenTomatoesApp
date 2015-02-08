@@ -11,23 +11,33 @@
 #import "UIImageView+AFNetworking.h"
 #import "MovieDetailViewController.h"
 #import "SVProgressHUD.h"
+#import "MovieCollectionCell.h"
 
-@interface MoviesViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface MoviesViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property UIRefreshControl *refreshControl;
 @property NSArray *movies;
 @property UILabel *networkErrorLabel;
+@property UISegmentedControl *gridListControl;
 @end
 
 @implementation MoviesViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    // table view setup
+    self.tableView.hidden = YES;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    
     [self.tableView registerNib:[UINib nibWithNibName:@"MovieCell" bundle:nil] forCellReuseIdentifier:@"MovieCell"];
+    
+    // collection view setup
+    self.collectionView.dataSource = self;
+    self.collectionView.delegate = self;
+    [self.collectionView registerNib:[UINib nibWithNibName:@"MovieCollectionCell" bundle:nil] forCellWithReuseIdentifier:@"MovieCollectionCell"];
     
     // display loading HUD
     [SVProgressHUD show];
@@ -40,11 +50,53 @@
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(onRefresh) forControlEvents:UIControlEventValueChanged];
     [self.tableView insertSubview:self.refreshControl atIndex:0];
+    
+    // set grid list segmented control
+    NSArray *iconArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"list"], [UIImage imageNamed:@"grid"], nil];
+    self.gridListControl = [[UISegmentedControl alloc] initWithItems:iconArray];
+    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.gridListControl];
+    self.navigationItem.rightBarButtonItem = barButtonItem;
+    [self.gridListControl addTarget:self action:@selector(segmentedControlValueDidChange:) forControlEvents:UIControlEventValueChanged];
+    self.gridListControl.selectedSegmentIndex = 0;
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark - Segmented control methods
+- (void)segmentedControlValueDidChange:(UISegmentedControl *)segment {
+    switch (segment.selectedSegmentIndex) {
+        case 0: {
+            self.tableView.hidden = YES;
+            self.collectionView.hidden = NO;
+            break;
+        }
+        case 1: {
+            self.tableView.hidden = NO;
+            self.collectionView.hidden = YES;
+            NSLog(@"list");
+            break;
+        }
+    }
+}
+
+#pragma mark - Collection view methods
+-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 10;
+}
+
+-(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return 2;
+}
+
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    MovieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MovieCollectionCell" forIndexPath:indexPath];
+    UILabel *label = (UILabel *) [cell viewWithTag:100];
+    [label setText:@"HIKEN"];
+    return cell;
 }
 
 #pragma mark - Table methods
@@ -73,6 +125,7 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
+#pragma mark - Network methods
 - (void)showNetworkError {
     CGRect viewRect = CGRectMake(self.tableView.frame.origin.x, self.tableView.frame.origin.y, self.tableView.frame.size.width, 40);
     
