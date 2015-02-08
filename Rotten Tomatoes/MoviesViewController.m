@@ -50,6 +50,7 @@
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(onRefresh) forControlEvents:UIControlEventValueChanged];
     [self.tableView insertSubview:self.refreshControl atIndex:0];
+    [self.collectionView insertSubview:self.refreshControl atIndex:0];
     
     // set grid list segmented control
     NSArray *iconArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"list"], [UIImage imageNamed:@"grid"], nil];
@@ -77,7 +78,6 @@
         case 1: {
             self.tableView.hidden = NO;
             self.collectionView.hidden = YES;
-            NSLog(@"list");
             break;
         }
     }
@@ -105,6 +105,12 @@
     return cell;
 }
 
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    MovieDetailViewController *vc = [[MovieDetailViewController alloc] init];
+    vc.movie = self.movies[indexPath.row];
+    
+    [self.navigationController pushViewController:vc animated:YES];
+}
 #pragma mark - Table methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
