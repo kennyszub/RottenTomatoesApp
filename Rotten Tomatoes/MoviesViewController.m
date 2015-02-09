@@ -49,7 +49,6 @@
     // add refresh control
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(onRefresh) forControlEvents:UIControlEventValueChanged];
-    [self.tableView insertSubview:self.refreshControl atIndex:0];
     [self.collectionView insertSubview:self.refreshControl atIndex:0];
     
     // set grid list segmented control
@@ -73,11 +72,13 @@
         case 0: {
             self.tableView.hidden = YES;
             self.collectionView.hidden = NO;
+            [self.collectionView insertSubview:self.refreshControl atIndex:0];
             break;
         }
         case 1: {
             self.tableView.hidden = NO;
             self.collectionView.hidden = YES;
+            [self.tableView insertSubview:self.refreshControl atIndex:0];
             break;
         }
     }
@@ -97,9 +98,18 @@
     NSDictionary *movie = self.movies[indexPath.row];
 
     cell.titleLabel.text = movie[@"title"];
+    
+    NSString *rating = [movie valueForKeyPath:@"ratings.critics_score"];
+    cell.criticScore.text = [NSString stringWithFormat:@"%@%%", rating];
+    if ([rating intValue] >= 60) {
+        cell.freshRottenView.image = [UIImage imageNamed:@"fresh"];
+    } else {
+        cell.freshRottenView.image = [UIImage imageNamed:@"rotten"];
+    }
+    
+    cell.posterView.image = nil;
     NSString *url = [movie valueForKeyPath:@"posters.thumbnail"];
     url = [url stringByReplacingOccurrencesOfString:@"tmb" withString:@"ori"];
-    cell.posterView.image = nil;
     [cell.posterView setImageWithURL:[NSURL URLWithString:url]];
     
     return cell;

@@ -15,6 +15,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *synopsisLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *posterView;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property BOOL scrollViewIsUp;
+@property CGRect originalScrollViewFrame;
 @end
 
 @implementation MovieDetailViewController
@@ -27,6 +29,7 @@
     self.titleLabel.text = self.movie[@"title"];
     self.synopsisLabel.text = self.movie[@"synopsis"];
     [self.synopsisLabel sizeToFit];
+    self.title = self.movie[@"title"];
     
     // determine scrollview content size
     CGRect contentRect = CGRectZero;
@@ -34,11 +37,16 @@
         contentRect = CGRectUnion(contentRect, view.frame);
     }
     self.scrollView.contentSize = contentRect.size;
+    self.scrollViewIsUp = NO;
     
     // set poster
     NSString *url = [self.movie valueForKeyPath:@"posters.original"];
     url = [url stringByReplacingOccurrencesOfString:@"tmb" withString:@"ori"];
     [self.posterView setImageWithURL:[NSURL URLWithString:url]];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    self.originalScrollViewFrame = self.scrollView.frame;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -47,8 +55,15 @@
 }
 - (IBAction)scrollViewTapped:(id)sender {
     NSLog(@"scrollview tapped");
+    CGRect viewRect;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGRect viewRect = CGRectMake(0, self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height, self.scrollView.frame.size.width, screenRect.size.height);
+    if (self.scrollViewIsUp) {
+        self.scrollViewIsUp = NO;
+        viewRect = self.originalScrollViewFrame;
+    } else {
+        self.scrollViewIsUp = YES;
+        viewRect = CGRectMake(0, self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height, self.scrollView.frame.size.width, screenRect.size.height);
+    }
 
     [UIView animateWithDuration:.75 animations:^{
         self.scrollView.frame = viewRect;
@@ -62,6 +77,7 @@
     contentRect.size.height += 50;
     self.scrollView.contentSize = contentRect.size;
 }
+
 
 /*
 #pragma mark - Navigation
