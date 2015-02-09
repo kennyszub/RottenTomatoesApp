@@ -27,17 +27,9 @@
     
     // set title and synoposis
     self.titleLabel.text = self.movie[@"title"];
-    [self.titleLabel sizeToFit];
     self.synopsisLabel.text = self.movie[@"synopsis"];
-    [self.synopsisLabel sizeToFit];
     self.title = self.movie[@"title"];
     
-    // determine scrollview content size
-    CGRect contentRect = CGRectZero;
-    for (UIView *view in self.scrollView.subviews) {
-        contentRect = CGRectUnion(contentRect, view.frame);
-    }
-    self.scrollView.contentSize = contentRect.size;
     self.scrollViewIsUp = NO;
     
     // set poster
@@ -49,6 +41,16 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    [self.synopsisLabel sizeToFit];
+
+    // determine scrollview content size
+    CGRect contentRect = CGRectZero;
+    for (UIView *view in self.scrollView.subviews) {
+        contentRect = CGRectUnion(contentRect, view.frame);
+    }
+    self.scrollView.contentSize = contentRect.size;
+    
     self.originalScrollViewFrame = self.scrollView.frame;
 }
 
