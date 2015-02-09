@@ -13,14 +13,20 @@
 #import "SVProgressHUD.h"
 #import "MovieCollectionCell.h"
 
-@interface MoviesViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource>
+@interface MoviesViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property UIRefreshControl *refreshControl;
 @property NSArray *movies;
+@property NSArray *filteredMovies;
 @property UILabel *networkErrorLabel;
 @property UISegmentedControl *gridListControl;
+@property UISearchBar *searchBar;
+@property BOOL searchBarActive;
+@property UITapGestureRecognizer *screenTap;
+@property (weak, nonatomic) IBOutlet UISearchBar *tableSearchBar;
+
 @end
 
 @implementation MoviesViewController
@@ -65,6 +71,62 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!self.searchBar) {
+        // add search bar to collection view
+        self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height, [UIScreen mainScreen].bounds.size.width, 44)];
+        [self.view addSubview:self.searchBar];
+        self.searchBar.delegate = self;
+    }
+    
+    self.tableSearchBar.delegate = self;
+    
+    // prepare collection view contentInset/ContentOffset so searchBar fit at the top
+    self.collectionView.contentInset = UIEdgeInsetsMake(self.searchBar.frame.size.height, 0, 0, 0);
+    self.collectionView.contentOffset = CGPointMake(0, - self.searchBar.frame.size.height);
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+}
+
+#pragma mark - Search methods
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
+    if (searchText.length > 0) {
+        NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"(title contains[c] %@)", searchText];
+        self.filteredMovies = [self.movies filteredArrayUsingPredicate:resultPredicate];
+        self.searchBarActive = YES;
+        [self.collectionView reloadData];
+        [self.tableView reloadData];
+    } else {
+        self.filteredMovies = self.movies;
+        [self.collectionView reloadData];
+        [self.tableView reloadData];
+    }
+}
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    self.searchBarActive = YES;
+    [self.view endEditing:YES];
+}
+
+- (void) searchBarTextDidEndEditing:(UISearchBar *)searchBar {
+    [self.view removeGestureRecognizer:self.screenTap];
+}
+
+- (void) searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    // add tap recognizer
+    self.screenTap = [[UITapGestureRecognizer alloc]
+                                   initWithTarget:self
+                                   action:@selector(dismissKeyboard)];
+    [self.view addGestureRecognizer:self.screenTap];
+}
+
+- (void) dismissKeyboard {
+    [self.view endEditing:YES];
+}
+
 
 #pragma mark - Segmented control methods
 - (void)segmentedControlValueDidChange:(UISegmentedControl *)segment {
@@ -72,13 +134,18 @@
         case 0: {
             self.tableView.hidden = YES;
             self.collectionView.hidden = NO;
+            self.searchBar.hidden = NO;
             [self.collectionView insertSubview:self.refreshControl atIndex:0];
+            [self dismissKeyboard];
             break;
         }
         case 1: {
             self.tableView.hidden = NO;
             self.collectionView.hidden = YES;
+            self.searchBar.hidden = YES;
             [self.tableView insertSubview:self.refreshControl atIndex:0];
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            [self dismissKeyboard];
             break;
         }
     }
@@ -90,12 +157,21 @@
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.movies.count;
+    if (self.searchBarActive) {
+        return self.filteredMovies.count;
+    } else {
+        return self.movies.count;
+    }
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     MovieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MovieCollectionCell" forIndexPath:indexPath];
-    NSDictionary *movie = self.movies[indexPath.row];
+    NSDictionary *movie;
+    if (self.searchBarActive) {
+        movie = self.filteredMovies[indexPath.row];
+    } else {
+        movie = self.movies[indexPath.row];
+    }
 
     cell.titleLabel.text = movie[@"title"];
     
@@ -117,24 +193,42 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     MovieDetailViewController *vc = [[MovieDetailViewController alloc] init];
-    vc.movie = self.movies[indexPath.row];
-    
+    if (self.searchBarActive) {
+        vc.movie = self.filteredMovies[indexPath.row];
+    } else {
+        vc.movie = self.movies[indexPath.row];
+    }
+
+
+    [self.view endEditing:YES];
     [self.navigationController pushViewController:vc animated:YES];
 }
+
 #pragma mark - Table methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.movies.count;
+    if (self.searchBarActive) {
+        return self.filteredMovies.count;
+    } else {
+        return self.movies.count;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     MovieCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MovieCell" forIndexPath:indexPath];
-    NSDictionary *movie = self.movies[indexPath.row];
+    NSDictionary *movie;
+    if (self.searchBarActive) {
+        movie = self.filteredMovies[indexPath.row];
+    } else {
+        movie = self.movies[indexPath.row];
+
+    }
     
     cell.titleLabel.text = movie[@"title"];
     cell.synopsisLabel.text = movie[@"synopsis"];
     
     NSString *url = [movie valueForKeyPath:@"posters.thumbnail"];
+    url = [url stringByReplacingOccurrencesOfString:@"tmb" withString:@"ori"];
     cell.posterView.image = nil;
     [cell.posterView setImageWithURL:[NSURL URLWithString:url]];
     return cell;
@@ -143,7 +237,11 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     MovieDetailViewController *vc = [[MovieDetailViewController alloc] init];
-    vc.movie = self.movies[indexPath.row];
+    if (self.searchBarActive) {
+        vc.movie = self.filteredMovies[indexPath.row];
+    } else {
+        vc.movie = self.movies[indexPath.row];
+    }
     
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -164,7 +262,7 @@
 }
 
 - (void)onRefresh {
-    NSURL *url = [NSURL URLWithString:@"http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=7gc6v2tkga4wsbsq5qfk7kyd&limit=20"];
+    NSURL *url = [NSURL URLWithString:@"http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=7gc6v2tkga4wsbsq5qfk7kyd&limit=30"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         if (data == nil) {
@@ -173,8 +271,7 @@
         } else {
             [self hideNetworkError];
             NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            // TODO remove me
-            NSLog(@"response: %@", responseDictionary);
+           // NSLog(@"response: %@", responseDictionary);
             self.movies = responseDictionary[@"movies"];
             [self.tableView reloadData];
             [self.collectionView reloadData];
@@ -183,6 +280,8 @@
         [SVProgressHUD dismiss];
     }];
 }
+
+
 /*
 #pragma mark - Navigation
 

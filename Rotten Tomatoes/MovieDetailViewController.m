@@ -45,7 +45,8 @@
     [self.posterView setImageWithURL:[NSURL URLWithString:url]];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     self.originalScrollViewFrame = self.scrollView.frame;
 }
 
