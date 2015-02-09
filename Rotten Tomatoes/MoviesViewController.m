@@ -144,7 +144,9 @@
             self.collectionView.hidden = YES;
             self.searchBar.hidden = YES;
             [self.tableView insertSubview:self.refreshControl atIndex:0];
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            if (self.movies) {
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            }
             [self dismissKeyboard];
             break;
         }
@@ -227,6 +229,14 @@
     cell.titleLabel.text = movie[@"title"];
     cell.synopsisLabel.text = movie[@"synopsis"];
     
+    NSString *rating = [movie valueForKeyPath:@"ratings.critics_score"];
+    cell.criticsRating.text = [NSString stringWithFormat:@"%@%%", rating];
+    if ([rating intValue] >= 60) {
+        cell.rottonFreshView.image = [UIImage imageNamed:@"fresh"];
+    } else {
+        cell.rottonFreshView.image = [UIImage imageNamed:@"rotten"];
+    }
+    
     NSString *url = [movie valueForKeyPath:@"posters.thumbnail"];
     url = [url stringByReplacingOccurrencesOfString:@"tmb" withString:@"ori"];
     cell.posterView.image = nil;
@@ -248,7 +258,7 @@
 
 #pragma mark - Network methods
 - (void)showNetworkError {
-    CGRect viewRect = CGRectMake(0, self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height, self.tableView.frame.size.width, 40);
+    CGRect viewRect = CGRectMake(0, self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height, [UIScreen mainScreen].bounds.size.width, 44);
     UILabel *errorLabel = [[UILabel alloc] initWithFrame:viewRect];
     errorLabel.text = @"Network Error";
     errorLabel.textAlignment = NSTextAlignmentCenter;

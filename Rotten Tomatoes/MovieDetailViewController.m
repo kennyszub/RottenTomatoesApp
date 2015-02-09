@@ -27,6 +27,7 @@
     
     // set title and synoposis
     self.titleLabel.text = self.movie[@"title"];
+    [self.titleLabel sizeToFit];
     self.synopsisLabel.text = self.movie[@"synopsis"];
     [self.synopsisLabel sizeToFit];
     self.title = self.movie[@"title"];
@@ -41,6 +42,7 @@
     
     // set poster
     NSString *url = [self.movie valueForKeyPath:@"posters.original"];
+    [self.posterView setImageWithURL:[NSURL URLWithString:url]];
     url = [url stringByReplacingOccurrencesOfString:@"tmb" withString:@"ori"];
     [self.posterView setImageWithURL:[NSURL URLWithString:url]];
 }
