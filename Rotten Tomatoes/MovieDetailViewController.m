@@ -45,6 +45,23 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+- (IBAction)scrollViewTapped:(id)sender {
+    NSLog(@"scrollview tapped");
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect viewRect = CGRectMake(0, self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height, self.scrollView.frame.size.width, screenRect.size.height);
+
+    [UIView animateWithDuration:.75 animations:^{
+        self.scrollView.frame = viewRect;
+    }];
+    
+    // determine scrollview content size
+    CGRect contentRect = CGRectZero;
+    for (UIView *view in self.scrollView.subviews) {
+        contentRect = CGRectUnion(contentRect, view.frame);
+    }
+    contentRect.size.height += 50;
+    self.scrollView.contentSize = contentRect.size;
+}
 
 /*
 #pragma mark - Navigation

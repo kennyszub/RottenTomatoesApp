@@ -53,7 +53,7 @@
     [self.collectionView insertSubview:self.refreshControl atIndex:0];
     
     // set grid list segmented control
-    NSArray *iconArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"list"], [UIImage imageNamed:@"grid"], nil];
+    NSArray *iconArray = [NSArray arrayWithObjects:[UIImage imageNamed:@"grid"], [UIImage imageNamed:@"list"], nil];
     self.gridListControl = [[UISegmentedControl alloc] initWithItems:iconArray];
     UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.gridListControl];
     self.navigationItem.rightBarButtonItem = barButtonItem;
@@ -140,14 +140,13 @@
 
 #pragma mark - Network methods
 - (void)showNetworkError {
-    CGRect viewRect = CGRectMake(self.tableView.frame.origin.x, self.tableView.frame.origin.y, self.tableView.frame.size.width, 40);
-    
+    CGRect viewRect = CGRectMake(0, self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height, self.tableView.frame.size.width, 40);
     UILabel *errorLabel = [[UILabel alloc] initWithFrame:viewRect];
     errorLabel.text = @"Network Error";
     errorLabel.textAlignment = NSTextAlignmentCenter;
     errorLabel.backgroundColor = [UIColor yellowColor];
     self.networkErrorLabel = errorLabel;
-    [self.tableView addSubview:self.networkErrorLabel];
+    [self.view.superview addSubview:self.networkErrorLabel];
 }
 
 - (void)hideNetworkError {
